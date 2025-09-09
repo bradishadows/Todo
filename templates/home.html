@@ -1,0 +1,720 @@
+{% extends 'main.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo-List Avancée</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            color: #2d3436;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #6c5ce7 0%, #a29bfe 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+            transform: rotate(30deg);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        .description {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            position: relative;
+        }
+        
+        .app-container {
+            padding: 30px;
+        }
+        
+        .input-container {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 12px;
+            position: relative;
+        }
+        
+        #taskInput {
+            flex: 1;
+            padding: 18px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            outline: none;
+            background: #f5f6fa;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+        
+        #taskInput:focus {
+            background: white;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+        }
+        
+        #taskInput::placeholder {
+            color: #a5b1c2;
+        }
+        
+        #addButton {
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0 25px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.4);
+        }
+        
+        #addButton:hover {
+            background: #5649c5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(108, 92, 231, 0.5);
+        }
+        
+        .search-container {
+            display: flex;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        #searchInput {
+            flex: 1;
+            padding: 16px 20px 16px 50px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            background: #f5f6fa;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+        
+        #searchInput:focus {
+            background: white;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a5b1c2;
+            font-size: 1.2rem;
+        }
+        
+        .filters {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            gap: 12px;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            border: none;
+            background: #f5f6fa;
+            color: #596275;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .filter-btn.active, .filter-btn:hover {
+            background: #6c5ce7;
+            color: white;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+        }
+        
+        #taskList {
+            list-style-type: none;
+            margin-bottom: 25px;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 18px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            animation: fadeIn 0.5s;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid #6c5ce7;
+        }
+        
+        .task-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .task-item.completed {
+            background: #f8f9ff;
+            border-left-color: #00b894;
+        }
+        
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #8395a7;
+        }
+        
+        .task-checkbox {
+            margin-right: 18px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #6c5ce7;
+        }
+        
+        .task-text {
+            flex: 1;
+            font-size: 1.15rem;
+            word-break: break-word;
+            color: #2d3436;
+            transition: color 0.3s;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .task-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #dfe6e9;
+            transition: color 0.3s, transform 0.2s;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .task-actions button:hover {
+            transform: scale(1.1);
+        }
+        
+        .edit-btn:hover {
+            color: #fdcb6e !important;
+            background: rgba(253, 203, 110, 0.1);
+        }
+        
+        .delete-btn:hover {
+            color: #ff7675 !important;
+            background: rgba(255, 118, 117, 0.1);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 18px;
+            background: #f5f6fa;
+            border-radius: 12px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stats span {
+            font-weight: 600;
+            color: #6c5ce7;
+        }
+        
+        .clear-container {
+            text-align: center;
+        }
+        
+        #clearButton {
+            padding: 14px 28px;
+            background: #ff7675;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(255, 118, 117, 0.4);
+        }
+        
+        #clearButton:hover {
+            background: #ff5e57;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 118, 117, 0.5);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8395a7;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #d8dbe0;
+        }
+        
+        .empty-state p {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(20px); }
+        }
+        
+        @media (max-width: 480px) {
+            .filters {
+                flex-wrap: wrap;
+            }
+            
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .task-actions {
+                align-self: flex-end;
+                margin-top: 15px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .description {
+                font-size: 1rem;
+            }
+        }
+        
+        .task-date {
+            font-size: 0.8rem;
+            color: #a5b1c2;
+            margin-top: 5px;
+        }
+        
+        .celebrate {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff5e57;
+            opacity: 0.7;
+        }
+        
+        .highlight {
+            background-color: #fffacd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .search-info {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #6c5ce7;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-check-circle"></i> Todo-List</h1>
+           
+        </header>
+        
+        <div class="app-container">
+            <div class="input-container">
+                <input type="text" id="taskInput" placeholder="Quelle est votre prochaine tâche?">
+                <button id="addButton"><i class="fas fa-plus"></i></button>
+            </div>
+            
+            <div class="search-container">
+                <div class="search-icon"><i class="fas fa-search"></i></div>
+                <input type="text" id="searchInput" placeholder="Rechercher une tâche...">
+            </div>
+            
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">Toutes</button>
+                <button class="filter-btn" data-filter="active">Actives</button>
+                <button class="filter-btn" data-filter="completed">Complétées</button>
+            </div>
+            
+            <div id="searchInfo" class="search-info" style="display: none;"></div>
+            
+            <ul id="taskList">
+                <div class="empty-state">
+                    <i class="fas fa-check-double"></i>
+                    <p>Vous n'avez aucune tâche pour le moment</p>
+                    <p class="task-date">Ajoutez votre première tâche ci-dessus</p>
+                </div>
+            </ul>
+            
+            <div class="stats">
+                <span id="totalTasks">Total: 0 tâches</span>
+                <span id="completedTasks">Complétées: 0</span>
+            </div>
+            
+            <div class="clear-container">
+                <button id="clearButton"><i class="fas fa-trash-alt"></i> Supprimer les tâches complétées</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="celebrate" id="celebrate"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Références aux éléments DOM
+            const taskInput = document.getElementById('taskInput');
+            const addButton = document.getElementById('addButton');
+            const searchInput = document.getElementById('searchInput');
+            const taskList = document.getElementById('taskList');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const clearButton = document.getElementById('clearButton');
+            const totalTasksSpan = document.getElementById('totalTasks');
+            const completedTasksSpan = document.getElementById('completedTasks');
+            const celebrateEl = document.getElementById('celebrate');
+            const searchInfo = document.getElementById('searchInfo');
+            
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            let currentFilter = 'all';
+            let searchTerm = '';
+            
+            // Initialisation
+            updateTaskList();
+            updateStats();
+            
+            // Ajouter une tâche
+            addButton.addEventListener('click', addTask);
+            taskInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addTask();
+                }
+            });
+            
+            // Filtrer les tâches
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.getAttribute('data-filter');
+                    updateTaskList();
+                });
+            });
+            
+            // Recherche de tâches
+            searchInput.addEventListener('input', function() {
+                searchTerm = this.value.toLowerCase().trim();
+                updateTaskList();
+                updateStats();
+            });
+            
+            // Supprimer les tâches complétées
+            clearButton.addEventListener('click', function() {
+                if (confirm('Êtes-vous sûr de vouloir supprimer toutes les tâches complétées ?')) {
+                    tasks = tasks.filter(task => !task.completed);
+                    saveTasks();
+                    updateTaskList();
+                    updateStats();
+                }
+            });
+            
+            function capitalizeFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+            
+            function highlightText(text, search) {
+                if (!search) return text;
+                
+                const regex = new RegExp(`(${search})`, 'gi');
+                return text.replace(regex, '<span class="highlight">$1</span>');
+            }
+            
+            function addTask() {
+                const taskText = taskInput.value.trim();
+                if (taskText === '') return;
+                
+                // Mettre la première lettre en majuscule
+                const formattedText = capitalizeFirstLetter(taskText);
+                
+                const newTask = {
+                    id: Date.now(),
+                    text: formattedText,
+                    completed: false,
+                    timestamp: new Date().toISOString(),
+                    date: new Date().toLocaleDateString('fr-FR', { 
+                        weekday: 'short', 
+                        day: 'numeric', 
+                        month: 'short' 
+                    })
+                };
+                
+                tasks.push(newTask);
+                saveTasks();
+                updateTaskList();
+                updateStats();
+                
+                taskInput.value = '';
+                taskInput.focus();
+            }
+            
+            function updateTaskList() {
+                // Filtrer les tâches selon le filtre actuel
+                let filteredTasks = tasks;
+                if (currentFilter === 'active') {
+                    filteredTasks = tasks.filter(task => !task.completed);
+                } else if (currentFilter === 'completed') {
+                    filteredTasks = tasks.filter(task => task.completed);
+                }
+                
+                // Filtrer par terme de recherche
+                let searchedTasks = filteredTasks;
+                if (searchTerm) {
+                    searchedTasks = filteredTasks.filter(task => 
+                        task.text.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                // Afficher le message d'état vide si nécessaire
+                if (searchedTasks.length === 0) {
+                    let message = '';
+                    if (searchTerm) {
+                        message = 'Aucune tâche ne correspond à votre recherche';
+                    } else if (currentFilter === 'all') {
+                        message = 'Vous n\'avez aucune tâche pour le moment';
+                    } else if (currentFilter === 'active') {
+                        message = 'Aucune tâche active';
+                    } else {
+                        message = 'Aucune tâche complétée';
+                    }
+                    
+                    taskList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-search${searchTerm ? '' : '-plus'}"></i>
+                            <p>${message}</p>
+                            <p class="task-date">${!searchTerm ? 'Ajoutez votre première tâche ci-dessus' : 'Modifiez votre recherche'}</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Afficher les tâches
+                taskList.innerHTML = '';
+                searchedTasks.forEach(task => {
+                    const li = document.createElement('li');
+                    li.className = `task-item ${task.completed ? 'completed' : ''}`;
+                    
+                    // Mettre en surbrillance le texte recherché
+                    const highlightedText = searchTerm ? 
+                        highlightText(task.text, searchTerm) : 
+                        task.text;
+                    
+                    li.innerHTML = `
+                        <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''}>
+                        <div style="flex: 1;">
+                            <span class="task-text">${highlightedText}</span>
+                            <div class="task-date">Ajouté le ${task.date}</div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="edit-btn"><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    `;
+                    
+                    // Gestion des événements pour la tâche
+                    const checkbox = li.querySelector('.task-checkbox');
+                    const editBtn = li.querySelector('.edit-btn');
+                    const deleteBtn = li.querySelector('.delete-btn');
+                    const taskText = li.querySelector('.task-text');
+                    
+                    checkbox.addEventListener('change', function() {
+                        task.completed = this.checked;
+                        li.className = `task-item ${task.completed ? 'completed' : ''}`;
+                        saveTasks();
+                        updateStats();
+                        
+                        // Animation de célébration si on a complété une tâche
+                        if (task.completed) {
+                            celebrate();
+                        }
+                        
+                        // Si on est en mode filtre, mettre à jour la liste
+                        if (currentFilter !== 'all' || searchTerm) {
+                            setTimeout(() => updateTaskList(), 300);
+                        }
+                    });
+                    
+                    deleteBtn.addEventListener('click', function() {
+                        if (confirm('Supprimer cette tâche ?')) {
+                            tasks = tasks.filter(t => t.id !== task.id);
+                            saveTasks();
+                            li.style.animation = 'fadeOut 0.5s';
+                            setTimeout(() => {
+                                updateTaskList();
+                                updateStats();
+                            }, 300);
+                        }
+                    });
+                    
+                    editBtn.addEventListener('click', function() {
+                        const newText = prompt('Modifier la tâche:', task.text);
+                        if (newText !== null && newText.trim() !== '') {
+                            // Mettre la première lettre en majuscule
+                            task.text = capitalizeFirstLetter(newText.trim());
+                            taskText.innerHTML = searchTerm ? 
+                                highlightText(task.text, searchTerm) : 
+                                task.text;
+                            saveTasks();
+                        }
+                    });
+                    
+                    taskList.appendChild(li);
+                });
+            }
+            
+            function updateStats() {
+                // Filtrer les tâches selon le filtre actuel
+                let filteredTasks = tasks;
+                if (currentFilter === 'active') {
+                    filteredTasks = tasks.filter(task => !task.completed);
+                } else if (currentFilter === 'completed') {
+                    filteredTasks = tasks.filter(task => task.completed);
+                }
+                
+                // Filtrer par terme de recherche
+                let searchedTasks = filteredTasks;
+                if (searchTerm) {
+                    searchedTasks = filteredTasks.filter(task => 
+                        task.text.toLowerCase().includes(searchTerm)
+                    );
+                    
+                    // Afficher l'info de recherche
+                    searchInfo.style.display = 'block';
+                    const total = searchedTasks.length;
+                    searchInfo.textContent = `  ${total} tâche${total !== 1 ? 's' : ''} correspondent à votre recherche`;
+                } else {
+                    searchInfo.style.display = 'none';
+                }
+                
+                // Mettre à jour les statistiques affichées
+                const totalTasks = searchedTasks.length;
+                const completedTasks = searchedTasks.filter(task => task.completed).length;
+                
+                totalTasksSpan.textContent = `Affichées: ${totalTasks} tâche${totalTasks !== 1 ? 's' : ''}`;
+                completedTasksSpan.textContent = `Complétées: ${completedTasks}`;
+            }
+            
+            function saveTasks() {
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            }
+            
+            function celebrate() {
+                celebrateEl.style.opacity = '1';
+                
+                // Créer des confettis
+                for (let i = 0; i < 50; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    confetti.style.background = ['#6c5ce7', '#a29bfe', '#fd79a8', '#fdcb6e', '#00b894'][Math.floor(Math.random() * 5)];
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    celebrateEl.appendChild(confetti);
+                    
+                    // Animation
+                    confetti.animate([
+                        { top: '-10px', opacity: 1 },
+                        { top: '100vh', opacity: 0 }
+                    ], {
+                        duration: 2000 + Math.random() * 3000,
+                        easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
+                    });
+                }
+                
+                // Cacher après l'animation
+                setTimeout(() => {
+                    celebrateEl.style.opacity = '0';
+                    celebrateEl.innerHTML = '';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

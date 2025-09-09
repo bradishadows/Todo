@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barre de Navigation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        
+        .nav-item {
+            color: #2c3e50;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            padding: 10px 5px;
+            position: relative;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .nav-item:hover {
+            color: #4ca1af;
+            transform: translateY(-2px);
+        }
+        
+        .nav-item:hover::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #4ca1af, transparent);
+        }
+        
+        /* Version pour Django - à intégrer dans votre base.html */
+        .navbar-django {
+            background: linear-gradient(90deg, #2c3e50 0%, #4ca1af 100%);
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-django-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            height: 60px;
+        }
+        
+        .nav-django-item {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 8px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-django-item:hover {
+            color: #ffeb3b;
+        }
+        
+        .nav-django-item.active {
+            color: #ffeb3b;
+            font-weight: 600;
+        }
+        
+        .nav-django-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #ffeb3b;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container, .nav-django-container {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px 0;
+                height: auto;
+            }
+            
+            .navbar, .navbar-django {
+                padding: 10px;
+            }
+            
+            .nav-item, .nav-django-item {
+                width: 100%;
+                text-align: center;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <nav class="nav-container">
+            <a href="#" class="nav-item">Accueil</a>
+            <a href="#" class="nav-item">A propos</a>
+            <a href="#" class="nav-item">Contacts</a>
+            <a href="#" class="nav-item">Inscriptions</a>
+            <a href="#" class="nav-item">Connexion</a>
+        </nav>
+    </div>
+
+</body>
+</html>
